@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>J Arena Booking System — Project Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#0a0c10; --surface:#111419; --surface2:#181d24; --border:#1e2630;
+      --accent:#00d4aa; --accent2:#ff6b35; --accent3:#4f9eff;
+      --text:#e8edf3; --muted:#6b7a8d; --dim:#3d4a57;
+      --green:#22c55e; --yellow:#f59e0b; --red:#ef4444;
+      --purple:#a78bfa; --pink:#f472b6; --orange:#fb923c;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size:48px 48px;opacity:.32;
+    }
+    body::after{
+      content:'';position:fixed;top:-180px;right:-180px;width:650px;height:650px;pointer-events:none;z-index:0;
+      background:radial-gradient(circle,rgba(0,212,170,.07) 0%,transparent 70%);
+    }
+
+    .wrap{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 24px;}
+
+    /* ── HEADER ── */
+    header{
+      border-bottom:1px solid var(--border);padding:18px 0;
+      position:sticky;top:0;background:rgba(10,12,16,.93);
+      backdrop-filter:blur(18px);z-index:200;
+    }
+    .hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .logo{display:flex;align-items:center;gap:11px;}
+    .logo-badge{
+      width:38px;height:38px;border-radius:10px;
+      background:linear-gradient(135deg,var(--accent),var(--accent3));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Bebas Neue',sans-serif;font-size:19px;color:#000;
+    }
+    .logo-name{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:2px;}
+    .logo-sub{font-size:11px;color:var(--muted);font-weight:300;}
+    .hdr-right{display:flex;align-items:center;gap:10px;}
+
+    .pill{
+      display:flex;align-items:center;gap:7px;
+      border-radius:100px;padding:6px 14px;
+      font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    }
+    .pill-active{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);color:var(--green);}
+    .pulse{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.65);}}
+
+    /* JIRA BUTTON */
+    .btn-jira{
+      display:flex;align-items:center;gap:7px;
+      background:rgba(79,158,255,.12);border:1px solid rgba(79,158,255,.3);
+      border-radius:8px;padding:7px 14px;
+      font-size:12px;font-weight:700;color:var(--accent3);
+      cursor:pointer;text-decoration:none;
+      transition:background .2s,border-color .2s;
+    }
+    .btn-jira:hover{background:rgba(79,158,255,.2);border-color:rgba(79,158,255,.55);}
+    .btn-jira svg{width:16px;height:16px;flex-shrink:0;}
+
+    /* ── NAV TABS ── */
+    .nav-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:44px;overflow-x:auto;}
+    .tab{
+      padding:13px 20px;font-size:13px;font-weight:600;color:var(--muted);
+      cursor:pointer;border-bottom:2px solid transparent;
+      transition:color .2s,border-color .2s;user-select:none;white-space:nowrap;
+    }
+    .tab:hover{color:var(--text);}
+    .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+    /* ── HERO ── */
+    .hero{padding:56px 0 40px;}
+    .hero-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,90px);line-height:.93;letter-spacing:2px;}
+    .hero-title .hollow{-webkit-text-stroke:2px var(--accent);color:transparent;}
+    .hero-desc{font-size:14px;color:var(--muted);font-weight:300;max-width:580px;margin-top:18px;line-height:1.75;}
+
+    /* ── STATS ── */
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:40px;}
+    .sc{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:12px;padding:18px 16px;position:relative;overflow:hidden;
+      transition:border-color .2s;
+    }
+    .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+    .sc.c1::before{background:var(--accent);}
+    .sc.c2::before{background:var(--yellow);}
+    .sc.c3::before{background:var(--accent3);}
+    .sc.c4::before{background:var(--purple);}
+    .sc.c5::before{background:var(--accent2);}
+    .sc:hover{border-color:var(--accent);}
+    .sv{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1;margin-bottom:3px;}
+    .sc.c1 .sv{color:var(--accent);}
+    .sc.c2 .sv{color:var(--yellow);}
+    .sc.c3 .sv{color:var(--accent3);}
+    .sc.c4 .sv{color:var(--purple);}
+    .sc.c5 .sv{color:var(--accent2);}
+    .sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+
+    /* ── SECTION LABEL ── */
+    .sec-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;}
+
+    /* ── OVERALL PROGRESS ── */
+    .overall{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 30px;margin-bottom:40px;}
+    .ov-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;}
+    .ov-title{font-family:'Bebas Neue',sans-serif;font-size:25px;letter-spacing:1px;}
+    .ov-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+    .ov-pct{font-family:'Bebas Neue',sans-serif;font-size:50px;color:var(--accent);line-height:1;}
+    .track{height:8px;background:var(--border);border-radius:100px;overflow:hidden;}
+    .fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--accent3));animation:grow 1.6s cubic-bezier(.4,0,.2,1) forwards;width:0%;}
+    @keyframes grow{to{width:var(--w);}}
+
+    /* ── MODULE GRID ── */
+    .mod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:40px;}
+
+    .mod{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:14px;padding:20px;position:relative;overflow:hidden;
+      transition:border-color .2s,transform .2s;
+    }
+    .mod:hover{border-color:#2a3545;transform:translateY(-2px);}
+    .mod::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;}
+
+    /* module accent colours */
+    .m1::before{background:var(--accent);}
+    .m2::before{background:var(--accent3);}
+    .m3::before{background:var(--yellow);}
+    .m4::before{background:var(--green);}
+    .m5::before{background:var(--pink);}
+    .m6::before{background:var(--orange);}
+
+    .mod-num{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:9px;opacity:.6;}
+    .mod-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.8px;line-height:1.15;margin-bottom:11px;}
+
+    .mod-status-row{display:flex;align-items:center;gap:7px;margin-bottom:9px;}
+    .sbadge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;}
+    .sb-done    {background:rgba(34,197,94,.15);color:var(--green);}
+    .sb-wip     {background:rgba(245,158,11,.15);color:var(--yellow);}
+    .sb-todo    {background:rgba(79,158,255,.15);color:var(--accent3);}
+    .sb-planned {background:rgba(167,139,250,.15);color:var(--purple);}
+
+    .mod-pct{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+    .m1 .mod-pct{color:var(--accent);}
+    .m2 .mod-pct{color:var(--accent3);}
+    .m3 .mod-pct{color:var(--yellow);}
+    .m4 .mod-pct{color:var(--green);}
+    .m5 .mod-pct{color:var(--pink);}
+    .m6 .mod-pct{color:var(--orange);}
+
+    .mod-bar-track{height:4px;background:var(--border);border-radius:100px;overflow:hidden;margin-bottom:13px;}
+    .mod-bar-fill{height:100%;border-radius:100px;animation:grow 2s cubic-bezier(.4,0,.2,1) forwards;width:0%;}
+    .m1 .mod-bar-fill{background:var(--accent);}
+    .m2 .mod-bar-fill{background:var(--accent3);}
+    .m3 .mod-bar-fill{background:var(--yellow);}
+    .m4 .mod-bar-fill{background:var(--green);}
+    .m5 .mod-bar-fill{background:var(--pink);}
+    .m6 .mod-bar-fill{background:var(--orange);}
+
+    .mod-features{list-style:none;}
+    .mod-features li{
+      font-size:11px;color:var(--muted);padding:3px 0;
+      display:flex;align-items:flex-start;gap:7px;line-height:1.45;
+    }
+    .mod-features li::before{content:'·';color:var(--dim);flex-shrink:0;}
+
+    .mod-sub-tag{
+      font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;
+      padding:1px 6px;border-radius:3px;text-transform:uppercase;
+      letter-spacing:.5px;display:inline-block;margin-top:10px;
+    }
+    .merged-tag{background:rgba(0,212,170,.12);color:var(--accent);}
+    .new-tag{background:rgba(251,146,60,.15);color:var(--orange);}
+
+    /* ── TASK BOARD ── */
+    .board{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;}
+    .tcol{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .col-hdr{display:flex;align-items:center;gap:9px;margin-bottom:16px;}
+    .col-dot{width:9px;height:9px;border-radius:50%;}
+    .col-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;}
+    .col-cnt{
+      margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:100px;padding:2px 10px;color:var(--muted);
+    }
+
+    .ti{
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:9px;padding:11px 13px;margin-bottom:8px;
+      transition:border-color .2s,transform .2s;
+    }
+    .ti:hover{border-color:#2a3545;transform:translateX(3px);}
+    .ti:last-child{margin-bottom:0;}
+    .ti-name{font-size:12px;font-weight:600;margin-bottom:5px;line-height:1.4;}
+    .ti-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+
+    .tag{
+      font-family:'JetBrains Mono',monospace;font-size:9px;
+      padding:2px 7px;border-radius:3px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;
+    }
+    .t-done    {background:rgba(34,197,94,.15); color:var(--green);}
+    .t-wip     {background:rgba(245,158,11,.15);color:var(--yellow);}
+    .t-todo    {background:rgba(79,158,255,.15);color:var(--accent3);}
+    .t-planned {background:rgba(167,139,250,.15);color:var(--purple);}
+    .tm1{background:rgba(0,212,170,.1);color:var(--accent);}
+    .tm2{background:rgba(79,158,255,.1);color:var(--accent3);}
+    .tm3{background:rgba(245,158,11,.1);color:var(--yellow);}
+    .tm4{background:rgba(34,197,94,.1);color:var(--green);}
+    .tm5{background:rgba(244,114,182,.1);color:var(--pink);}
+    .tm6{background:rgba(251,146,60,.1);color:var(--orange);}
+
+    /* ── UPDATES ── */
+    .feed{display:flex;flex-direction:column;position:relative;margin-bottom:40px;}
+    .feed::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:1px;background:var(--border);}
+    .fi{display:flex;gap:16px;padding:0 0 24px 0;position:relative;}
+    .f-icon{
+      width:36px;height:36px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;font-size:13px;position:relative;z-index:1;
+      border:2px solid var(--bg);
+    }
+    .ic-g{background:rgba(34,197,94,.2);}
+    .ic-y{background:rgba(245,158,11,.2);}
+    .ic-b{background:rgba(79,158,255,.2);}
+    .ic-t{background:rgba(0,212,170,.2);}
+    .ic-r{background:rgba(239,68,68,.2);}
+    .f-body{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 17px;flex:1;}
+    .f-meta{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
+    .f-author{font-size:13px;font-weight:600;}
+    .f-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);}
+    .f-text{font-size:13px;color:var(--muted);line-height:1.6;}
+
+    /* media in updates */
+    .u-media{margin-top:11px;}
+    .media-grid{display:grid;gap:8px;}
+    .mg-1{grid-template-columns:1fr;max-width:340px;}
+    .mg-2{grid-template-columns:1fr 1fr;}
+    .mg-3{grid-template-columns:1fr 1fr 1fr;}
+    .mg-4{grid-template-columns:1fr 1fr;}
+    .mthumb{position:relative;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px solid var(--border);cursor:pointer;}
+    .mthumb img{width:100%;height:135px;object-fit:cover;display:block;transition:transform .3s;}
+    .mthumb:hover img{transform:scale(1.04);}
+    .mthumb video{width:100%;height:135px;object-fit:cover;display:block;}
+    .vwrap{position:relative;}
+    .voverlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.42);pointer-events:none;}
+    .pbtn{width:40px;height:40px;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);border:2px solid rgba(255,255,255,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;}
+    .mlabel{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.65));padding:16px 8px 6px;font-size:10px;color:rgba(255,255,255,.7);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    /* ── ADD UPDATE ── */
+    .add-update{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:40px;}
+    .form-title{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1px;margin-bottom:16px;}
+    .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+    .ff{display:flex;flex-direction:column;gap:5px;}
+    .ff label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+    .ff input,.ff select,.ff textarea{
+      background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+      padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;
+      transition:border-color .2s;
+    }
+    .ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--accent);}
+    .ff textarea{resize:vertical;min-height:84px;}
+    .ff select option{background:var(--surface2);}
+    .full{grid-column:1/-1;}
+
+    .upload-zone{
+      border:2px dashed var(--border);border-radius:12px;padding:26px 20px;
+      text-align:center;cursor:pointer;position:relative;
+      transition:border-color .2s,background .2s;
+    }
+    .upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:rgba(0,212,170,.04);}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .uico{font-size:28px;margin-bottom:8px;display:block;}
+    .utitle{font-size:13px;font-weight:600;margin-bottom:3px;}
+    .uhint{font-size:11px;color:var(--muted);}
+    .uhint span{color:var(--accent);}
+
+    .prev-strip{display:flex;flex-wrap:wrap;gap:9px;margin-top:11px;}
+    .pthumb{position:relative;width:74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
+    .pthumb img,.pthumb video{width:100%;height:100%;object-fit:cover;display:block;}
+    .pthumb .rbtn{position:absolute;top:3px;right:3px;width:16px;height:16px;background:rgba(239,68,68,.9);border:none;border-radius:50%;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .pthumb .vbadge{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.75);border-radius:3px;padding:1px 4px;font-size:9px;color:#fff;font-family:'JetBrains Mono',monospace;}
+
+    .form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .btn-post{background:linear-gradient(135deg,var(--accent),var(--accent3));border:none;border-radius:8px;padding:10px 24px;color:#000;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .2s,transform .1s;}
+    .btn-post:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-post:active{transform:translateY(0);}
+    .fcnt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+    .fcnt span{color:var(--accent);}
+
+    /* ── GALLERY ── */
+    .gal-filters{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;}
+    .gbtn{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+    .gbtn:hover{border-color:var(--accent);color:var(--accent);}
+    .gbtn.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
+    .gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:12px;}
+    .gcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s,transform .2s;cursor:pointer;}
+    .gcard:hover{border-color:var(--accent);transform:translateY(-2px);}
+    .gthumb{position:relative;height:145px;background:var(--surface2);overflow:hidden;}
+    .gthumb img,.gthumb video{width:100%;height:100%;object-fit:cover;display:block;}
+    .gtype{position:absolute;top:7px;left:7px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border-radius:3px;padding:2px 7px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;}
+    .gt-img{color:var(--accent);}
+    .gt-vid{color:var(--accent2);}
+    .ginfo{padding:10px 12px;}
+    .gauthor{font-size:12px;font-weight:600;margin-bottom:2px;}
+    .gcap{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .gdate{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);margin-top:4px;}
+    .gempty{grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--dim);font-size:13px;}
+    .gempty .eico{font-size:36px;margin-bottom:10px;display:block;}
+
+    /* ── LIGHTBOX ── */
+    .lb{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .lb.open{opacity:1;pointer-events:all;}
+    .lb-inner{position:relative;max-width:900px;width:100%;}
+    .lb-close{position:absolute;top:-42px;right:0;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;transition:color .2s;}
+    .lb-close:hover{color:var(--text);}
+    .lb-media img,.lb-media video{width:100%;max-height:70vh;object-fit:contain;border-radius:10px;display:block;}
+    .lb-cap{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;}
+
+    /* ── PAGE SECTIONS ── */
+    .psec{display:none;}
+    .psec.active{display:block;}
+
+    /* ── FOOTER ── */
+    footer{border-top:1px solid var(--border);padding:20px 0;text-align:center;}
+    .ftxt{font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+    .ftxt span{color:var(--accent);}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--green);border-radius:10px;padding:12px 17px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green);z-index:999;transform:translateY(80px);opacity:0;transition:transform .3s,opacity .3s;}
+    .toast.show{transform:translateY(0);opacity:1;}
+
+    /* ── ANIMS ── */
+    @keyframes up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .au{animation:up .5s ease forwards;}
+    .au:nth-child(1){animation-delay:.05s;}
+    .au:nth-child(2){animation-delay:.1s;}
+    .au:nth-child(3){animation-delay:.15s;}
+    .au:nth-child(4){animation-delay:.2s;}
+    .au:nth-child(5){animation-delay:.25s;}
+
+    @media(max-width:960px){.mod-grid{grid-template-columns:1fr 1fr;}.stats{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:680px){.mod-grid{grid-template-columns:1fr;}.board{grid-template-columns:1fr;}.fg{grid-template-columns:1fr;}.stats{grid-template-columns:1fr 1fr;}.hero-title{font-size:48px;}.mg-3{grid-template-columns:1fr 1fr;}}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="wrap">
+    <div class="hdr">
+      <div class="logo">
+        <div class="logo-badge">JA</div>
+        <div>
+          <div class="logo-name">J Arena Project Hub</div>
+          <div class="logo-sub">Booking System — Internal Tracker</div>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <!-- JIRA BUTTON -->
+        <a class="btn-jira" href="https://jira.atlassian.com" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.571 11.429L6.857 6.714A6.857 6.857 0 0 0 11.571 19.5v-8.071z" fill="#4f9eff" opacity=".6"/>
+            <path d="M12.429 12.571L17.143 17.286A6.857 6.857 0 0 0 12.429 4.5v8.071z" fill="#4f9eff"/>
+          </svg>
+          Open Jira Board
+        </a>
+        <div class="pill pill-active">
+          <div class="pulse"></div>
+          IN PROGRESS
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label">// Project Dashboard · 6 Modules</div>
+    <h1 class="hero-title">BOOKING<br><span class="hollow">SYSTEM</span></h1>
+    <p class="hero-desc">Full-stack sports venue booking platform for J Arena — 6 integrated modules covering fields, bookings, payments, notifications, event promotion, and team tournaments.</p>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="sc c1 au"><div class="sv">6</div><div class="sl">Total Modules</div></div>
+    <div class="sc c2 au"><div class="sv" id="wip-count">3</div><div class="sl">In Progress</div></div>
+    <div class="sc c3 au"><div class="sv" id="done-count">1</div><div class="sl">Completed</div></div>
+    <div class="sc c4 au"><div class="sv" id="daysLeft">–</div><div class="sl">Days Left</div></div>
+    <div class="sc c5 au"><div class="sv" id="mediaCountStat">0</div><div class="sl">Media Files</div></div>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="nav-tabs">
+    <div class="tab active" onclick="switchTab('modules',this)">🧩 Modules</div>
+    <div class="tab" onclick="switchTab('tasks',this)">✅ Task Board</div>
+    <div class="tab" onclick="switchTab('updates',this)">💬 Team Updates</div>
+    <div class="tab" onclick="switchTab('media',this)">🖼️ Media Gallery <span id="mediaCount" style="font-size:10px;opacity:.55;"></span></div>
+  </div>
+
+  <!-- ══════════════════════ TAB: MODULES ══════════════════════ -->
+  <div class="psec active" id="tab-modules">
+
+    <div class="sec-label">// Overall Progress — 6 Modules</div>
+    <div class="overall">
+      <div class="ov-hdr">
+        <div>
+          <div class="ov-title">J Arena Booking System</div>
+          <div class="ov-sub">6 Modules · Target: End of May 2025</div>
+        </div>
+        <div class="ov-pct">37%</div>
+      </div>
+      <div class="track"><div class="fill" style="--w:37%;"></div></div>
+    </div>
+
+    <div class="sec-label">// Module Breakdown</div>
+    <div class="mod-grid">
+
+      <!-- M1: Booking, Field & Schedule (merged) -->
+      <div class="mod m1">
+        <div class="mod-num">Module 01</div>
+        <div class="mod-name">Booking, Field & Schedule</div>
+        <div class="mod-status-row">
+          <span class="sbadge sb-wip">In Progress</span>
+          <span class="mod-pct">45%</span>
+        </div>
+        <div class="mod-bar-track"><div class="mod-bar-fill" style="--w:45%;"></div></div>
+        <ul class="mod-features">
+          <li>Fields / courts setup & configuration</li>
+          <li>Time slots with peak / off-peak pricing</li>
+          <li>Maintenance blocks & unavailability</li>
+          <li>Double-booking prevention logic</li>
+          <li>Slot search, soft lock & confirmation</li>
+          <li>Recurring bookings, modifications & cancellations</li>
+          <li>Visual calendar — day / week / month views</li>
+          <li>Colour-coded availability & filters</li>
+          <li>External calendar sync (Google / iCal)</li>
+        </ul>
+        <span class="mod-sub-tag merged-tag">⚡ Field + Schedule + Calendar merged</span>
+      </div>
+
+      <!-- M2: User & Auth -->
+      <div class="mod m2">
+        <div class="mod-num">Module 02</div>
+        <div class="mod-name">User & Authentication</div>
+        <div class="mod-status-row">
+          <span class="sbadge sb-done">Completed</span>
+          <span class="mod-pct">100%</span>
+        </div>
+        <div class="mod-bar-track"><div class="mod-bar-fill" style="--w:100%;"></div></div>
+        <ul class="mod-features">
+          <li>Roles: Player, Captain, Admin</li>
+          <li>Registration, login & JWT auth</li>
+          <li>User profiles & account settings</li>
+          <li>Team membership management</li>
+          <li>Password reset via email</li>
+        </ul>
+      </div>
+
+      <!-- M3: Payment & Invoicing -->
+      <div class="mod m3">
+        <div class="mod-num">Module 03</div>
+        <div class="mod-name">Payment & Invoicing</div>
+        <div class="mod-status-row">
+          <span class="sbadge sb-wip">In Progress</span>
+          <span class="mod-pct">25%</span>
+        </div>
+        <div class="mod-bar-track"><div class="mod-bar-fill" style="--w:25%;"></div></div>
+        <ul class="mod-features">
+          <li>FPX & e-wallet payment gateways</li>
+          <li>Invoice generation & PDF download</li>
+          <li>Refund processing & credit notes</li>
+          <li>Promo codes & discount rules</li>
+          <li>Split payment between players</li>
+        </ul>
+      </div>
+
+      <!-- M4: Notification & Reminder -->
+      <div class="mod m4">
+        <div class="mod-num">Module 04</div>
+        <div class="mod-name">Notification & Reminder</div>
+        <div class="mod-status-row">
+          <span class="sbadge sb-wip">In Progress</span>
+          <span class="mod-pct">30%</span>
+        </div>
+        <div class="mod-bar-track"><div class="mod-bar-fill" style="--w:30%;"></div></div>
+        <ul class="mod-features">
+          <li>Email / SMS / push notifications</li>
+          <li>Booking confirmation alerts</li>
+          <li>Session reminders (24h & 1h before)</li>
+          <li>Cancellation & modification alerts</li>
+          <li>Admin broadcast announcements</li>
+        </ul>
+      </div>
+
+      <!-- M5: Event Promotion (NEW) -->
+      <div class="mod m5">
+        <div class="mod-num">Module 05</div>
+        <div class="mod-name">Event Promotion</div>
+        <div class="mod-status-row">
+          <span class="sbadge sb-todo">To Do</span>
+          <span class="mod-pct">0%</span>
+        </div>
+        <div class="mod-bar-track"><div class="mod-bar-fill" style="--w:0%;"></div></div>
+        <ul class="mod-features">
+          <li>Event creation & banner management</li>
+          <li>Public event listing & landing pages</li>
+          <li>Online registration & RSVP system</li>
+          <li>Promo banners, social sharing links</li>
+          <li>Attendance tracking & check-in</li>
+          <li>Post-event analytics & reports</li>
+        </ul>
+        <span class="mod-sub-tag new-tag">✨ New Module</span>
+      </div>
+
+      <!-- M6: Team & Tournament -->
+      <div class="mod m6">
+        <div class="mod-num">Module 06</div>
+        <div class="mod-name">Team & Tournament</div>
+        <div class="mod-status-row">
+          <span class="sbadge sb-planned">Planned</span>
+          <span class="mod-pct">0%</span>
+        </div>
+        <div class="mod-bar-track"><div class="mod-bar-fill" style="--w:0%;"></div></div>
+        <ul class="mod-features">
+          <li>Team rosters & captain management</li>
+          <li>Captain-level group bookings</li>
+          <li>Tournament bracket builder</li>
+          <li>Match results & history</li>
+          <li>Team statistics & leaderboards</li>
+        </ul>
+      </div>
+
+    </div><!-- /mod-grid -->
+  </div>
+
+  <!-- ══════════════════════ TAB: TASKS ══════════════════════ -->
+  <div class="psec" id="tab-tasks">
+
+    <!-- Row 1: Done + In Progress -->
+    <div class="board">
+      <div class="tcol">
+        <div class="col-hdr"><div class="col-dot" style="background:var(--green)"></div><div class="col-title">Completed</div><div class="col-cnt">7 tasks</div></div>
+        <div class="ti"><div class="ti-name">Project requirements & scope document</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm2">M2 Auth</span></div></div>
+        <div class="ti"><div class="ti-name">System architecture & ERD (all modules)</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">UI/UX wireframes & mockups</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Full database schema (6 modules)</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">User registration, login & JWT auth</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm2">M2 Auth</span></div></div>
+        <div class="ti"><div class="ti-name">Role-based access (Player/Captain/Admin)</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm2">M2 Auth</span></div></div>
+        <div class="ti"><div class="ti-name">Admin dashboard layout & navigation</div><div class="ti-meta"><span class="tag t-done">Done</span><span class="tag tm1">M1 Booking</span></div></div>
+      </div>
+      <div class="tcol">
+        <div class="col-hdr"><div class="col-dot" style="background:var(--yellow)"></div><div class="col-title">In Progress</div><div class="col-cnt">7 tasks</div></div>
+        <div class="ti"><div class="ti-name">Fields & courts API — CRUD + soft-delete</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Time slot & peak / off-peak pricing logic</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Slot search, soft lock & booking confirmation</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Booking cart & checkout flow (UI + API)</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">FPX & e-wallet payment gateway integration</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm3">M3 Payment</span></div></div>
+        <div class="ti"><div class="ti-name">Email / SMS notification service setup</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm4">M4 Notif</span></div></div>
+        <div class="ti"><div class="ti-name">Booking confirmation & reminder alerts</div><div class="ti-meta"><span class="tag t-wip">WIP</span><span class="tag tm4">M4 Notif</span></div></div>
+      </div>
+    </div>
+
+    <!-- Row 2: To Do + Planned -->
+    <div class="board">
+      <div class="tcol">
+        <div class="col-hdr"><div class="col-dot" style="background:var(--accent3)"></div><div class="col-title">To Do</div><div class="col-cnt">14 tasks</div></div>
+        <div class="ti"><div class="ti-name">Maintenance blocks & double-booking prevention</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Recurring bookings & bulk booking</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Modifications & cancellation flow</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Visual calendar — day / week / month views</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">External calendar sync (Google / iCal)</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm1">M1 Booking</span></div></div>
+        <div class="ti"><div class="ti-name">Invoice generation, refunds & promo codes</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm3">M3 Payment</span></div></div>
+        <div class="ti"><div class="ti-name">Split payment between players</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm3">M3 Payment</span></div></div>
+        <div class="ti"><div class="ti-name">Push notification — in-app & mobile</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm4">M4 Notif</span></div></div>
+        <div class="ti"><div class="ti-name">Event creation & banner management</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm5">M5 Events</span></div></div>
+        <div class="ti"><div class="ti-name">Public event listing & RSVP system</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm5">M5 Events</span></div></div>
+        <div class="ti"><div class="ti-name">Promo banners & social sharing links</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm5">M5 Events</span></div></div>
+        <div class="ti"><div class="ti-name">Attendance tracking & check-in</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm5">M5 Events</span></div></div>
+        <div class="ti"><div class="ti-name">Post-event analytics & reports</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm5">M5 Events</span></div></div>
+        <div class="ti"><div class="ti-name">UAT, bug fixing & full deployment</div><div class="ti-meta"><span class="tag t-todo">To Do</span><span class="tag tm2">QA</span></div></div>
+      </div>
+      <div class="tcol">
+        <div class="col-hdr"><div class="col-dot" style="background:var(--purple)"></div><div class="col-title">Planned — M6 Team & Tournament</div><div class="col-cnt">5 tasks</div></div>
+        <div class="ti"><div class="ti-name">Team rosters & captain permission system</div><div class="ti-meta"><span class="tag t-planned">Planned</span><span class="tag tm6">M6 Team</span></div></div>
+        <div class="ti"><div class="ti-name">Captain group booking flow</div><div class="ti-meta"><span class="tag t-planned">Planned</span><span class="tag tm6">M6 Team</span></div></div>
+        <div class="ti"><div class="ti-name">Tournament bracket builder & scheduling</div><div class="ti-meta"><span class="tag t-planned">Planned</span><span class="tag tm6">M6 Team</span></div></div>
+        <div class="ti"><div class="ti-name">Match results recording & history</div><div class="ti-meta"><span class="tag t-planned">Planned</span><span class="tag tm6">M6 Team</span></div></div>
+        <div class="ti"><div class="ti-name">Team statistics & leaderboards</div><div class="ti-meta"><span class="tag t-planned">Planned</span><span class="tag tm6">M6 Team</span></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════ TAB: UPDATES ══════════════════════ -->
+  <div class="psec" id="tab-updates">
+
+    <div class="sec-label">// Team Updates</div>
+    <div class="feed" id="updateFeed">
+
+      <div class="fi">
+        <div class="f-icon ic-g">✅</div>
+        <div class="f-body">
+          <div class="f-meta"><span class="f-author">Team</span><span class="f-time">Today · 10:30 AM</span></div>
+          <div class="f-text">M2 User & Auth completed — login, register, JWT, and full role-based access (Player / Captain / Admin) all working. Password reset via email confirmed OK.</div>
+        </div>
+      </div>
+
+      <div class="fi">
+        <div class="f-icon ic-y">🔧</div>
+        <div class="f-body">
+          <div class="f-meta"><span class="f-author">Team</span><span class="f-time">Yesterday · 3:15 PM</span></div>
+          <div class="f-text">M1 Booking — slot search and soft lock logic partially done. Overlapping booking edge cases and peak pricing rules still need handling before confirmation flow is wired up.</div>
+        </div>
+      </div>
+
+      <div class="fi">
+        <div class="f-icon ic-b">📋</div>
+        <div class="f-body">
+          <div class="f-meta"><span class="f-author">Team</span><span class="f-time">2 days ago · 11:00 AM</span></div>
+          <div class="f-text">Client meeting done — confirmed FPX + e-wallet for M3 Payment, and scoped out the new M5 Event Promotion module. Key features: event banners, RSVP, attendance tracking. Module list finalised at 6.</div>
+        </div>
+      </div>
+
+      <div class="fi">
+        <div class="f-icon ic-t">🎨</div>
+        <div class="f-body">
+          <div class="f-meta"><span class="f-author">Team</span><span class="f-time">3 days ago · 2:00 PM</span></div>
+          <div class="f-text">Fields & Courts API scaffolded. CRUD operations working in Postman. Admin UI connected to live endpoints. Time slot config is next up.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- POST UPDATE FORM -->
+    <div class="add-update">
+      <div class="form-title">Post a Team Update</div>
+      <div class="fg">
+        <div class="ff">
+          <label>Your Name</label>
+          <input type="text" id="updateName" placeholder="e.g. Ahmad, Siti, Raj..."/>
+        </div>
+        <div class="ff">
+          <label>Category</label>
+          <select id="updateCategory">
+            <option value="✅">✅ Completed Task</option>
+            <option value="🔧">🔧 In Progress</option>
+            <option value="📋">📋 Meeting / Discussion</option>
+            <option value="⚠️">⚠️ Blocker / Issue</option>
+            <option value="🎨">🎨 Design / Frontend</option>
+            <option value="💡">💡 Idea / Suggestion</option>
+          </select>
+        </div>
+        <div class="ff full">
+          <label>Update Message</label>
+          <textarea id="updateMessage" placeholder="Which module? What was done? Any blockers?"></textarea>
+        </div>
+        <div class="ff full">
+          <label>📎 Attach Screenshots or Videos <span style="color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" accept="image/*,video/*" multiple onchange="handleFiles(this.files)"/>
+            <span class="uico">📁</span>
+            <div class="utitle">Drop files here or click to browse</div>
+            <div class="uhint">Supports <span>PNG, JPG, GIF, MP4, MOV, WebM</span> · Max 50MB per file</div>
+          </div>
+          <div class="prev-strip" id="prevStrip"></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-post" onclick="postUpdate()">Post Update →</button>
+        <div class="fcnt" id="fcnt"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════ TAB: MEDIA ══════════════════════ -->
+  <div class="psec" id="tab-media">
+    <div class="sec-label">// Media Gallery</div>
+    <div class="gal-filters">
+      <button class="gbtn active" onclick="filterGal('all',this)">All</button>
+      <button class="gbtn" onclick="filterGal('image',this)">🖼️ Screenshots</button>
+      <button class="gbtn" onclick="filterGal('video',this)">🎬 Videos</button>
+    </div>
+    <div class="gal-grid" id="galGrid">
+      <div class="gempty"><span class="eico">📂</span>No media uploaded yet.<br>Post an update with a screenshot or video — it'll appear here.</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="wrap">
+    <div class="ftxt">J Arena Booking System · <span>6 Modules</span> · Last updated: <span id="lastUp"></span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">✅ Update posted!</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="lbBg(event)">
+  <div class="lb-inner">
+    <button class="lb-close" onclick="closeLb()">✕</button>
+    <div class="lb-media" id="lbMedia"></div>
+    <div class="lb-cap" id="lbCap"></div>
+  </div>
+</div>
+
+<script>
+  let pending = [];
+  let gallery = [];
+  let galFilter = 'all';
+
+  // Init
+  document.getElementById('lastUp').textContent = new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'});
+  const d = Math.ceil((new Date('2025-05-31') - new Date()) / 86400000);
+  document.getElementById('daysLeft').textContent = d > 0 ? d : '0';
+
+  // Tabs
+  function switchTab(id, el) {
+    document.querySelectorAll('.psec').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  // Drag & drop
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+
+  function handleFiles(list) {
+    Array.from(list).forEach(f => {
+      if (!f.type.startsWith('image/') && !f.type.startsWith('video/')) return;
+      if (f.size > 50*1024*1024) { alert(f.name + ' exceeds 50MB.'); return; }
+      const r = new FileReader();
+      r.onload = e => {
+        const item = { dataUrl: e.target.result, type: f.type.startsWith('video/') ? 'video' : 'image', name: f.name };
+        const idx = pending.length;
+        pending.push(item);
+        addPreview(item, idx);
+        updFcnt();
+      };
+      r.readAsDataURL(f);
+    });
+  }
+
+  function addPreview(item, idx) {
+    const strip = document.getElementById('prevStrip');
+    const t = document.createElement('div');
+    t.className = 'pthumb';
+    t.innerHTML = item.type === 'image'
+      ? `<img src="${item.dataUrl}" />`
+      : `<video src="${item.dataUrl}" muted></video><div class="vbadge">VID</div>`;
+    const rm = document.createElement('button');
+    rm.className = 'rbtn'; rm.textContent = '✕';
+    rm.onclick = () => { pending[idx] = null; t.remove(); updFcnt(); };
+    t.appendChild(rm);
+    strip.appendChild(t);
+  }
+
+  function updFcnt() {
+    const c = pending.filter(Boolean).length;
+    document.getElementById('fcnt').innerHTML = c > 0 ? `<span>${c}</span> file${c>1?'s':''} attached` : '';
+  }
+
+  function postUpdate() {
+    const name = document.getElementById('updateName').value.trim();
+    const cat  = document.getElementById('updateCategory').value;
+    const msg  = document.getElementById('updateMessage').value.trim();
+    if (!name || !msg) { alert('Please fill in your name and update message.'); return; }
+
+    const files = pending.filter(Boolean);
+    const now = new Date();
+    const ts = now.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
+    const ds = now.toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'});
+
+    const ic = {'✅':'ic-g','🔧':'ic-y','📋':'ic-b','⚠️':'ic-r','🎨':'ic-t','💡':'ic-b'}[cat]||'ic-t';
+
+    let media = '';
+    if (files.length > 0) {
+      const si = gallery.length;
+      const cc = ['','mg-1','mg-2','mg-3','mg-4'][Math.min(files.length,4)];
+      const thumbs = files.slice(0,4).map((f,i) => {
+        const gi = si+i;
+        return f.type==='image'
+          ? `<div class="mthumb" onclick="openLb(${gi})"><img src="${f.dataUrl}"/><div class="mlabel">${h(f.name)}</div></div>`
+          : `<div class="mthumb" onclick="openLb(${gi})"><div class="vwrap"><video src="${f.dataUrl}" muted></video><div class="voverlay"><div class="pbtn">▶</div></div></div><div class="mlabel">📹 ${h(f.name)}</div></div>`;
+      }).join('');
+      media = `<div class="u-media"><div class="media-grid ${cc}">${thumbs}</div></div>`;
+      files.forEach(f => gallery.push({dataUrl:f.dataUrl,type:f.type,name:f.name,author:name,caption:msg,date:`${ds} · ${ts}`}));
+      updGalBadge(); renderGal();
+    }
+
+    const el = document.createElement('div');
+    el.className = 'fi';
+    el.style.cssText = 'opacity:0;transform:translateY(10px);';
+    el.innerHTML = `
+      <div class="f-icon ${ic}">${cat}</div>
+      <div class="f-body">
+        <div class="f-meta"><span class="f-author">${h(name)}</span><span class="f-time">Just now · ${ts}</span></div>
+        <div class="f-text">${h(msg)}</div>
+        ${media}
+      </div>`;
+
+    const feed = document.getElementById('updateFeed');
+    feed.insertBefore(el, feed.firstChild);
+    requestAnimationFrame(() => { el.style.transition='opacity .4s,transform .4s'; el.style.opacity='1'; el.style.transform='translateY(0)'; });
+
+    document.getElementById('updateName').value='';
+    document.getElementById('updateMessage').value='';
+    document.getElementById('prevStrip').innerHTML='';
+    pending=[]; updFcnt();
+
+    showToast(files.length>0 ? `✅ Posted with ${files.length} file${files.length>1?'s':''}!` : '✅ Update posted!');
+  }
+
+  function updGalBadge() {
+    const c = gallery.length;
+    document.getElementById('mediaCount').textContent = c>0?`(${c})`:'';
+    document.getElementById('mediaCountStat').textContent = c;
+  }
+
+  function renderGal(f) {
+    if (f!==undefined) galFilter=f;
+    const grid = document.getElementById('galGrid');
+    const items = gallery.filter(i => galFilter==='all' || i.type===galFilter);
+    if (!items.length) {
+      grid.innerHTML=`<div class="gempty"><span class="eico">📂</span>No media uploaded yet.<br>Post an update with a screenshot or video — it'll appear here.</div>`;
+      return;
+    }
+    grid.innerHTML = items.map(item => {
+      const gi = gallery.indexOf(item);
+      const thumb = item.type==='video'
+        ? `<video src="${item.dataUrl}" muted></video><div class="voverlay"><div class="pbtn">▶</div></div>`
+        : `<img src="${item.dataUrl}"/>`;
+      const badge = item.type==='video'
+        ? `<div class="gtype gt-vid">VIDEO</div>`
+        : `<div class="gtype gt-img">IMG</div>`;
+      return `<div class="gcard" onclick="openLb(${gi})">
+        <div class="gthumb">${thumb}${badge}</div>
+        <div class="ginfo">
+          <div class="gauthor">${h(item.author)}</div>
+          <div class="gcap">${h(item.caption)}</div>
+          <div class="gdate">${item.date}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function filterGal(type, btn) {
+    document.querySelectorAll('.gbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGal(type);
+  }
+
+  function openLb(idx) {
+    const item = gallery[idx]; if (!item) return;
+    document.getElementById('lbCap').textContent = `${item.author} · ${item.date} — ${item.caption}`;
+    document.getElementById('lbMedia').innerHTML = item.type==='image'
+      ? `<img src="${item.dataUrl}"/>`
+      : `<video src="${item.dataUrl}" controls autoplay style="width:100%;max-height:70vh;border-radius:10px;"></video>`;
+    document.getElementById('lb').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeLb() {
+    const lb=document.getElementById('lb');
+    lb.classList.remove('open');
+    document.body.style.overflow='';
+    const v=lb.querySelector('video'); if(v)v.pause();
+  }
+
+  function lbBg(e) { if(e.target===document.getElementById('lb'))closeLb(); }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLb();});
+
+  function showToast(msg) {
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3500);
+  }
+
+  function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
